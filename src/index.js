@@ -8,17 +8,15 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-// Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Endpoint to fetch image filenames
 app.get('/images', (req, res) => {
     fs.readdir(path.join(__dirname, '../public/images'), (err, files) => {
         if (err) {
             console.error('Error reading images directory:', err);
             return res.status(500).send('Server error');
         }
-        res.json(files); // Send filenames as JSON
+        res.json(files);
     });
 });
 
@@ -28,20 +26,25 @@ let imageSelections = {};
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
 
-    // Add the user with their socket ID
-    users.push({ id: socket.id, lockedIn: false });
-    io.emit('update-users', users);
+    socket.on('set-name', (name) => {
+        if (users.some(user => user.userName === name)) {
+            socket.emit('name-taken', 'This name is already taken');
+            return;
+        }
+        users.push({ id: socket.id, userName: name, lockedIn: false });
+        io.emit('update-users', users);
+        console.log(`${name} has connected`);
+    });
 
-    socket.on('lock-in', (data) => {
-        console.log(`Received lock-in from socket ${socket.id}:`, data);
-        const { selections } = data;
-        const user = users.find(u => u.id === socket.id);
+    socket.on('lock-in', ({ userName, selections }) => {
+        console.log(`Received lock-in from ${userName}:`, selections);
+        const user = users.find(u => u.userName === userName && u.id === socket.id);
         if (user) {
             user.lockedIn = true;
             imageSelections[socket.id] = selections;
             io.emit('update-users', users);
         } else {
-            console.error(`User with socket ID ${socket.id} not found`);
+            console.error(`User ${userName} not found`);
         }
     });
 
@@ -56,8 +59,19 @@ io.on('connection', (socket) => {
 
         console.log('Aggregated selections:', selections);
         io.emit('update-images', Object.keys(selections).filter(img => selections[img] > 1));
-        imageSelections = {}; // Reset selections
+        imageSelections = {};
     });
+	socket.on('reset', () => {
+		console.log('Reset event triggered');
+		// Reset the users and imageSelections
+		users.forEach(user => {
+			user.lockedIn = false;
+		});
+		imageSelections = {};
+		io.emit('update-users', users);
+		io.emit('update-images', []); // Clear images on the client side
+	});
+
 
     socket.on('disconnect', () => {
         console.log('A user disconnected:', socket.id);

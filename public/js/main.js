@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const imageContainer = document.getElementById('image-container');
     const lockButton = document.getElementById('lock-button');
     const confirmButton = document.getElementById('confirm-button');
+    const resetButton = document.getElementById('reset-button');
     const userStatusDiv = document.getElementById('user-status');
     
     const socket = io();
@@ -36,12 +37,15 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => console.error('Error loading images:', error));
 
+    socket.emit('set-name', userName);
+
     lockButton.addEventListener('click', () => {
         if (isLockedIn) return;
 
         isLockedIn = true;
         lockButton.disabled = true;
         confirmButton.disabled = false;
+        resetButton.disabled = false;
 
         const selections = getSelectedImages();
         console.log('User selections before locking in:', selections);
@@ -55,13 +59,22 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.emit('confirm');
     });
 
+    resetButton.addEventListener('click', () => {
+        console.log('Reset button clicked');
+        // Emit an event to the server to reset state if needed
+        socket.emit('reset');
+        // Clear selections and reset UI
+        resetUI();
+    });
+
     socket.on('update-users', (users) => {
         console.log('Updated users:', users);
         userStatusDiv.innerHTML = users.map(user => {
-            return `<p>${user.name}: <span class="${user.lockedIn ? 'locked-in' : 'not-locked-in'}">
+            return `<p>${user.userName || 'Unknown'}: <span class="${user.lockedIn ? 'locked-in' : 'not-locked-in'}">
                 ${user.lockedIn ? 'Locked In' : 'Not Locked In'}</span></p>`;
         }).join('');
         confirmButton.disabled = !users.every(user => user.lockedIn);
+        resetButton.disabled = false; // Enable reset if any user is locked in
     });
 
     socket.on('update-images', (commonSelections) => {
@@ -79,5 +92,19 @@ document.addEventListener('DOMContentLoaded', () => {
     function getSelectedImages() {
         return Array.from(document.querySelectorAll('.selectable-image.selected'))
             .map(img => img.src.split('/').pop());
+    }
+
+    function resetUI() {
+        // Reset image selection UI
+        document.querySelectorAll('.selectable-image').forEach(img => {
+            img.classList.remove('selected', 'common-selection', 'unique-selection');
+        });
+        // Reset buttons
+        lockButton.disabled = false;
+        confirmButton.disabled = true;
+        resetButton.disabled = false;
+        // Reset locked-in state
+        isLockedIn = false;
+		socket.emit('reset');
     }
 });
