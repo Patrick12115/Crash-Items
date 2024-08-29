@@ -61,17 +61,17 @@ io.on('connection', (socket) => {
         io.emit('update-images', Object.keys(selections).filter(img => selections[img] > 1));
         imageSelections = {};
     });
-	socket.on('reset', () => {
-		console.log('Reset event triggered');
-		// Reset the users and imageSelections
-		users.forEach(user => {
-			user.lockedIn = false;
-		});
-		imageSelections = {};
-		io.emit('update-users', users);
-		io.emit('update-images', []); // Clear images on the client side
-	});
 
+    socket.on('reset', () => {
+        console.log('Reset event triggered');
+        // Reset the users and imageSelections
+        users.forEach(user => {
+            user.lockedIn = false;
+        });
+        imageSelections = {};
+        io.emit('update-users', users);
+        io.emit('update-images', []); // Clear images on the client side
+    });
 
     socket.on('disconnect', () => {
         console.log('A user disconnected:', socket.id);
@@ -83,7 +83,7 @@ io.on('connection', (socket) => {
 // Use the PORT provided by Heroku, or 3000 if running locally
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+// Bind the server using server.listen, not app.listen
+server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
-
