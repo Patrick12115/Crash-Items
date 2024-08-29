@@ -80,11 +80,6 @@ io.on('connection', (socket) => {
     });
 });
 
-const express = require('express');
-const app = express();
-
-// Other configurations and routes
-
 // Use the PORT provided by Heroku, or 3000 if running locally
 const PORT = process.env.PORT || 3000;
 
