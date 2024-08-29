@@ -49,18 +49,25 @@ io.on('connection', (socket) => {
     });
 
     socket.on('confirm', () => {
-        console.log('Confirm event triggered');
-        console.log('Current imageSelections:', imageSelections);
+		console.log('Confirm button clicked');
+		console.log('Current imageSelections:', imageSelections);
 
-        const selections = {};
-        Object.values(imageSelections).flat().forEach(img => {
-            selections[img] = (selections[img] || 0) + 1;
-        });
+		const selections = {};
+		Object.values(imageSelections).flat().forEach(img => {
+			selections[img] = (selections[img] || 0) + 1;
+		});
 
-        console.log('Aggregated selections:', selections);
-        io.emit('update-images', Object.keys(selections).filter(img => selections[img] > 1));
-        imageSelections = {};
-    });
+		console.log('Aggregated selections:', selections);
+		
+		// Emit aggregated results and user-specific selections
+		io.emit('update-images', {
+			commonSelections: Object.keys(selections).filter(img => selections[img] > 1),
+			userSelections: imageSelections
+		});
+
+		imageSelections = {};
+	});
+
 
     socket.on('reset', () => {
         console.log('Reset event triggered');

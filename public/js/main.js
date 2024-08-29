@@ -77,17 +77,24 @@ document.addEventListener('DOMContentLoaded', () => {
         resetButton.disabled = false; // Enable reset if any user is locked in
     });
 
-    socket.on('update-images', (commonSelections) => {
-        console.log('Common selections:', commonSelections);
-        document.querySelectorAll('.selectable-image').forEach(img => {
-            const imgSrc = img.src.split('/').pop();
-            if (commonSelections.includes(imgSrc)) {
-                img.classList.add('common-selection');
-            } else if (img.classList.contains('selected')) {
-                img.classList.add('unique-selection');
-            }
-        });
-    });
+    socket.on('update-images', ({ commonSelections, userSelections }) => {
+		console.log('Common selections:', commonSelections);
+		const userSelectionsSet = new Set(getSelectedImages());
+
+		document.querySelectorAll('.selectable-image').forEach(img => {
+			const imgSrc = img.src.split('/').pop();
+
+			// Remove any existing indicators
+			img.classList.remove('common-selection', 'unique-selection');
+
+			if (userSelectionsSet.has(imgSrc) && commonSelections.includes(imgSrc)) {
+				img.classList.add('common-selection');
+			} else if (userSelectionsSet.has(imgSrc)) {
+				img.classList.add('unique-selection');
+			}
+		});
+	});
+
 
     function getSelectedImages() {
         return Array.from(document.querySelectorAll('.selectable-image.selected'))
