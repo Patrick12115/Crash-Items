@@ -1,0 +1,60 @@
+/* General styles */
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #333; /* Dark background for the whole page */
+    color: white;
+}
+
+#user-status {
+    margin-bottom: 20px;
+}
+
+#image-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+img.selectable-image {
+    width: 100px;
+    height: 100px;
+    margin: 10px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border 0.3s ease, background-color 0.3s ease;
+}
+
+img.selectable-image.selected {
+    border-color: blue;
+}
+
+button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #4CAF50; /* Green */
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button.locked-in {
+    background-color: #d9534f; /* Red */
+}
+
+button:disabled {
+    background-color: #aaa; /* Gray */
+}
+
+/* Styles for selection indicators */
+img.common-selection {
+    border-color: red;
+    background-color: rgba(255, 0, 0, 0.3); /* Red with transparency */
+}
+
+img.unique-selection {
+    border-color: green;
+    background-color: rgba(0, 255, 0, 0.3); /* Green with transparency */
+}
