@@ -64,6 +64,8 @@ io.on('connection', (socket) => {
             commonSelections: Object.keys(selections).filter(img => selections[img] > 1),
             userSelections: imageSelections
         });
+		
+		io.emit('confirm-pressed');
 
         imageSelections = {};
     });

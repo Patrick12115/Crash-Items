@@ -115,6 +115,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+	
+	socket.on('confirm-pressed', () => {
+        confirmButton.disabled = true;
+    });
+
 
     socket.on('reset-all', () => {
         console.log('Reset all clients');
