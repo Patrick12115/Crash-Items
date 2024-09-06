@@ -1,11 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const imageContainer = document.getElementById('image-container');
+    const imageContainer = document.getElementById('image-container'); // Define imageContainer here
     const lockButton = document.getElementById('lock-button');
     const confirmButton = document.getElementById('confirm-button');
     const resetButton = document.getElementById('reset-button');
     const lockoutButton = document.getElementById('lockout-button');
     const userStatusDiv = document.getElementById('user-status');
-    
+    const viewAggregatedPicksButton = document.getElementById('view-aggregated-picks-button'); // Ensure this ID matches
+
     const socket = io();
 
     let userName = prompt("Enter your name:");
@@ -15,12 +16,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     let isLockedIn = false;
-	
-	const pingInterval = 20000; // 20 seconds
+
+    const pingInterval = 20000; // 20 seconds
     setInterval(() => {
         socket.emit('ping');
     }, pingInterval);
-
 
     fetch('/images')
         .then(response => {
@@ -84,6 +84,20 @@ document.addEventListener('DOMContentLoaded', () => {
         lockoutButton.disabled = false; 
     });
 
+    viewAggregatedPicksButton.addEventListener('click', () => {
+        // Prompt user for password
+        const password = prompt('Enter the password to view All Picks and Crashes:');
+
+        // Check if the entered password matches the expected password
+        if (password === 'CheatingStinky') { // Replace 'yourPasswordHere' with your actual password
+            // Open the aggregated picks page in a new tab
+            window.open('/aggregated.html', '_blank');
+        } else {
+            // Alert user if the password is incorrect
+            alert('Incorrect password. Access denied.');
+        }
+    });
+
     socket.on('update-users', (users) => {
         console.log('Updated users:', users);
         userStatusDiv.innerHTML = users.map(user => {
@@ -121,11 +135,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-	
-	socket.on('confirm-pressed', () => {
+
+    socket.on('confirm-pressed', () => {
         confirmButton.disabled = true;
     });
-
 
     socket.on('reset-all', () => {
         console.log('Reset all clients');

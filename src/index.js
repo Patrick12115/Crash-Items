@@ -20,15 +20,27 @@ app.get('/images', (req, res) => {
     });
 });
 
+// Serve the aggregated picks page
+app.get('/aggregated-picks', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/aggregated.html'));
+});
+
+app.get('/aggregated-picks-data', (req, res) => {
+    res.json({
+        aggregatedSelections,
+        images: fs.readdirSync(path.join(__dirname, '../public/images'))
+    });
+});
+
 let users = [];
 let imageSelections = {};
 let lockedOutImages = [];
+let aggregatedSelections = {}; // Store aggregated picks here
 
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
-	
-	socket.on('ping', () => {
-        // Respond to the ping to keep the connection alive
+
+    socket.on('ping', () => {
         socket.emit('pong');
     });
 
@@ -65,13 +77,14 @@ io.on('connection', (socket) => {
 
         console.log('Aggregated selections:', selections);
 
+        aggregatedSelections = selections; // Update aggregated selections
+
         io.emit('update-images', {
             commonSelections: Object.keys(selections).filter(img => selections[img] > 1),
             userSelections: imageSelections
         });
-		
-		io.emit('confirm-pressed');
 
+        io.emit('confirm-pressed');
         imageSelections = {};
     });
 
@@ -82,21 +95,20 @@ io.on('connection', (socket) => {
     });
 
     socket.on('reset', () => {
-		console.log('Reset event triggered by', socket.id);
+        console.log('Reset event triggered by', socket.id);
 
-		// Reset logic on the server side
-		users.forEach(user => {
-			user.lockedIn = false;
-		});
-		imageSelections = {};
-		lockedOutImages = [];
-		
-		// Broadcast reset event to all clients
-		io.emit('reset-all'); // Notify all clients to reset
-		
-		io.emit('update-users', users);
-	});
+        // Reset logic on the server side
+        users.forEach(user => {
+            user.lockedIn = false;
+        });
+        imageSelections = {};
+        lockedOutImages = [];
 
+        // Broadcast reset event to all clients
+        io.emit('reset-all'); // Notify all clients to reset
+
+        io.emit('update-users', users);
+    });
 
     socket.on('disconnect', () => {
         console.log('A user disconnected:', socket.id);
