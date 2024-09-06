@@ -22,6 +22,7 @@ app.get('/images', (req, res) => {
 
 let users = [];
 let imageSelections = {};
+let lockedOutImages = [];
 
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
@@ -49,35 +50,42 @@ io.on('connection', (socket) => {
     });
 
     socket.on('confirm', () => {
-		console.log('Confirm button clicked');
-		console.log('Current imageSelections:', imageSelections);
+        console.log('Confirm button clicked');
+        console.log('Current imageSelections:', imageSelections);
 
-		const selections = {};
-		Object.values(imageSelections).flat().forEach(img => {
-			selections[img] = (selections[img] || 0) + 1;
-		});
+        const selections = {};
+        Object.values(imageSelections).flat().forEach(img => {
+            selections[img] = (selections[img] || 0) + 1;
+        });
 
-		console.log('Aggregated selections:', selections);
-		
-		// Emit aggregated results and user-specific selections
-		io.emit('update-images', {
-			commonSelections: Object.keys(selections).filter(img => selections[img] > 1),
-			userSelections: imageSelections
-		});
+        console.log('Aggregated selections:', selections);
 
-		imageSelections = {};
-	});
+        io.emit('update-images', {
+            commonSelections: Object.keys(selections).filter(img => selections[img] > 1),
+            userSelections: imageSelections
+        });
+
+        imageSelections = {};
+    });
+
+    // Handle lockout functionality
+    socket.on('lockout', (lockedImages) => {
+        console.log('Locking out images:', lockedImages);
+        lockedOutImages = lockedImages; // Store locked out images
+        io.emit('update-lockout', lockedOutImages); // Broadcast to all users
+    });
 
 
     socket.on('reset', () => {
         console.log('Reset event triggered');
-        // Reset the users and imageSelections
         users.forEach(user => {
             user.lockedIn = false;
         });
         imageSelections = {};
+        lockedOutImages = [];
         io.emit('update-users', users);
         io.emit('update-images', []); // Clear images on the client side
+        io.emit('update-lockout', lockedOutImages); // Clear locked out images on client side
     });
 
     socket.on('disconnect', () => {

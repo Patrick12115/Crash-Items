@@ -58,3 +58,16 @@ img.unique-selection {
     border-color: green;
     background-color: rgba(0, 255, 0, 0.3); /* Green with transparency */
 }
+img.locked-out {
+    border-color: grey;
+    background-color: rgba(128, 128, 128, 0.5); /* Grey with transparency */
+    pointer-events: none; /* Make it unclickable */
+}
+#lockout-button {
+    background-color: red;
+    color: white;
+}
+#lockout-button:hover:not(:disabled) {
+    background-color: darkred;
+}
+

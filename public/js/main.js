@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const lockButton = document.getElementById('lock-button');
     const confirmButton = document.getElementById('confirm-button');
     const resetButton = document.getElementById('reset-button');
+    const lockoutButton = document.getElementById('lockout-button');
     const userStatusDiv = document.getElementById('user-status');
     
     const socket = io();
@@ -28,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 img.src = `images/${imageName}`;
                 img.classList.add('selectable-image');
                 img.addEventListener('click', () => {
-                    if (!isLockedIn) {
+                    if (!isLockedIn && !img.classList.contains('locked-out')) {
                         img.classList.toggle('selected');
                     }
                 });
@@ -61,10 +62,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     resetButton.addEventListener('click', () => {
         console.log('Reset button clicked');
-        // Emit an event to the server to reset state if needed
         socket.emit('reset');
-        // Clear selections and reset UI
         resetUI();
+    });
+
+    lockoutButton.addEventListener('click', () => {
+        const selectedImages = getSelectedImages();
+        console.log('Locking out selected images:', selectedImages);
+
+        document.querySelectorAll('.selectable-image.selected').forEach(img => {
+            img.classList.add('locked-out');
+            img.classList.remove('selected');
+        });
+
+        socket.emit('lockout', selectedImages);
+        lockoutButton.disabled = false; 
     });
 
     socket.on('update-users', (users) => {
@@ -78,23 +90,32 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     socket.on('update-images', ({ commonSelections, userSelections }) => {
-		console.log('Common selections:', commonSelections);
-		const userSelectionsSet = new Set(getSelectedImages());
+        console.log('Common selections:', commonSelections);
+        const userSelectionsSet = new Set(getSelectedImages());
 
-		document.querySelectorAll('.selectable-image').forEach(img => {
-			const imgSrc = img.src.split('/').pop();
+        document.querySelectorAll('.selectable-image').forEach(img => {
+            const imgSrc = img.src.split('/').pop();
 
-			// Remove any existing indicators
-			img.classList.remove('common-selection', 'unique-selection');
+            img.classList.remove('common-selection', 'unique-selection');
 
-			if (userSelectionsSet.has(imgSrc) && commonSelections.includes(imgSrc)) {
-				img.classList.add('common-selection');
-			} else if (userSelectionsSet.has(imgSrc)) {
-				img.classList.add('unique-selection');
-			}
-		});
-	});
+            if (userSelectionsSet.has(imgSrc) && commonSelections.includes(imgSrc)) {
+                img.classList.add('common-selection');
+            } else if (userSelectionsSet.has(imgSrc)) {
+                img.classList.add('unique-selection');
+            }
+        });
+    });
 
+    socket.on('update-lockout', (lockedOutImages) => {
+        console.log('Received locked-out images:', lockedOutImages);
+        document.querySelectorAll('.selectable-image').forEach(img => {
+            const imgSrc = img.src.split('/').pop();
+            if (lockedOutImages.includes(imgSrc)) {
+                img.classList.add('locked-out');
+                img.classList.remove('selected'); // Ensure it's deselected as well
+            }
+        });
+    });
 
     function getSelectedImages() {
         return Array.from(document.querySelectorAll('.selectable-image.selected'))
@@ -102,16 +123,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function resetUI() {
-        // Reset image selection UI
         document.querySelectorAll('.selectable-image').forEach(img => {
-            img.classList.remove('selected', 'common-selection', 'unique-selection');
+            img.classList.remove('selected', 'common-selection', 'unique-selection', 'locked-out');
         });
-        // Reset buttons
         lockButton.disabled = false;
         confirmButton.disabled = true;
         resetButton.disabled = false;
-        // Reset locked-in state
         isLockedIn = false;
-		socket.emit('reset');
+        socket.emit('reset');
     }
 });
