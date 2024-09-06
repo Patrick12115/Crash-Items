@@ -68,25 +68,28 @@ io.on('connection', (socket) => {
         imageSelections = {};
     });
 
-    // Handle lockout functionality
     socket.on('lockout', (lockedImages) => {
         console.log('Locking out images:', lockedImages);
-        lockedOutImages = lockedImages; // Store locked out images
-        io.emit('update-lockout', lockedOutImages); // Broadcast to all users
+        lockedOutImages = lockedImages;
+        io.emit('update-lockout', lockedOutImages);
     });
-
 
     socket.on('reset', () => {
-        console.log('Reset event triggered');
-        users.forEach(user => {
-            user.lockedIn = false;
-        });
-        imageSelections = {};
-        lockedOutImages = [];
-        io.emit('update-users', users);
-        io.emit('update-images', []); // Clear images on the client side
-        io.emit('update-lockout', lockedOutImages); // Clear locked out images on client side
-    });
+		console.log('Reset event triggered by', socket.id);
+
+		// Reset logic on the server side
+		users.forEach(user => {
+			user.lockedIn = false;
+		});
+		imageSelections = {};
+		lockedOutImages = [];
+		
+		// Broadcast reset event to all clients
+		io.emit('reset-all'); // Notify all clients to reset
+		
+		io.emit('update-users', users);
+	});
+
 
     socket.on('disconnect', () => {
         console.log('A user disconnected:', socket.id);
@@ -95,10 +98,7 @@ io.on('connection', (socket) => {
     });
 });
 
-// Use the PORT provided by Heroku, or 3000 if running locally
 const PORT = process.env.PORT || 3000;
-
-// Bind the server using server.listen, not app.listen
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

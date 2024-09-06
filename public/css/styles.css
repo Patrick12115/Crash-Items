@@ -70,4 +70,3 @@ img.locked-out {
 #lockout-button:hover:not(:disabled) {
     background-color: darkred;
 }
-

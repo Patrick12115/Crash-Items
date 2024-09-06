@@ -62,8 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     resetButton.addEventListener('click', () => {
         console.log('Reset button clicked');
-        socket.emit('reset');
-        resetUI();
+        socket.emit('reset'); // Trigger reset on the server
     });
 
     lockoutButton.addEventListener('click', () => {
@@ -117,6 +116,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    socket.on('reset-all', () => {
+        console.log('Reset all clients');
+        resetUI(); // Call the reset function to reset UI
+        // Optionally, re-enable the lock-in button if needed
+        lockButton.disabled = false;
+        confirmButton.disabled = true;
+        resetButton.disabled = true; // Ensure the reset button is also disabled until lock-in
+    });
+
     function getSelectedImages() {
         return Array.from(document.querySelectorAll('.selectable-image.selected'))
             .map(img => img.src.split('/').pop());
@@ -128,8 +136,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         lockButton.disabled = false;
         confirmButton.disabled = true;
-        resetButton.disabled = false;
+        resetButton.disabled = true; // Disable reset until user is locked in
         isLockedIn = false;
-        socket.emit('reset');
+
+        // Clear and reset user status
+        socket.emit('update-users'); // Request the current user statuses from the server
     }
 });
