@@ -3,7 +3,7 @@ const http = require('http');
 const path = require('path');
 const fs = require('fs');
 const socketIo = require('socket.io');
-
+const lockoutSelections = {};
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
@@ -20,6 +20,14 @@ app.get('/images', (req, res) => {
     });
 });
 
+app.post('/lockout', (req, res) => {
+    const { userName, lockoutSelections: newLockoutSelections } = req.body;
+
+    // Store or update lockout selections for the current session or user
+    lockoutSelections[userName] = newLockoutSelections;
+    res.sendStatus(200);
+});
+
 // Serve the aggregated picks page
 app.get('/aggregated-picks', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/aggregated.html'));
@@ -28,6 +36,7 @@ app.get('/aggregated-picks', (req, res) => {
 app.get('/aggregated-picks-data', (req, res) => {
     res.json({
         aggregatedSelections,
+		lockedOutImages,
         images: fs.readdirSync(path.join(__dirname, '../public/images'))
     });
 });

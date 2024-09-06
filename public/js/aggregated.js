@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(data => {
             console.log('Aggregated picks data:', data);
 
-            const { aggregatedSelections, images } = data;
+            const { aggregatedSelections, lockedOutImages, images } = data;
 
             images.forEach(imageName => {
                 const img = document.createElement('img');
@@ -21,7 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Determine the selection color
                 const imgSrc = imageName;
-                if (aggregatedSelections[imgSrc] > 1) {
+                if (lockedOutImages.includes(imgSrc)) {
+                    img.classList.add('locked-out');
+                } else if (aggregatedSelections[imgSrc] > 1) {
                     img.classList.add('common-selection');
                 } else if (aggregatedSelections[imgSrc] === 1) {
                     img.classList.add('unique-selection');
