@@ -26,6 +26,11 @@ let lockedOutImages = [];
 
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
+	
+	socket.on('ping', () => {
+        // Respond to the ping to keep the connection alive
+        socket.emit('pong');
+    });
 
     socket.on('set-name', (name) => {
         if (users.some(user => user.userName === name)) {

@@ -15,6 +15,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     let isLockedIn = false;
+	
+	const pingInterval = 20000; // 20 seconds
+    setInterval(() => {
+        socket.emit('ping');
+    }, pingInterval);
+
 
     fetch('/images')
         .then(response => {
