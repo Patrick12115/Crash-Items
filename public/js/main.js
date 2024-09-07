@@ -1,11 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const imageContainer = document.getElementById('image-container'); // Define imageContainer here
+    const imageContainer = document.getElementById('image-container');
     const lockButton = document.getElementById('lock-button');
     const confirmButton = document.getElementById('confirm-button');
     const resetButton = document.getElementById('reset-button');
     const lockoutButton = document.getElementById('lockout-button');
     const userStatusDiv = document.getElementById('user-status');
-    const viewAggregatedPicksButton = document.getElementById('view-aggregated-picks-button'); // Ensure this ID matches
+    const viewAggregatedPicksButton = document.getElementById('view-aggregated-picks-button');
+    const warningMessage = document.getElementById('warning-message');
 
     const socket = io();
 
@@ -37,10 +38,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 img.addEventListener('click', () => {
                     if (!isLockedIn && !img.classList.contains('locked-out')) {
                         img.classList.toggle('selected');
+                        handleVisibility(); // Check visibility after selection
                     }
                 });
                 imageContainer.appendChild(img);
             });
+
+            // Call handleVisibility() after all images have been added
+            handleVisibility();
         })
         .catch(error => console.error('Error loading images:', error));
 
@@ -57,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const selections = getSelectedImages();
         console.log('User selections before locking in:', selections);
         socket.emit('lock-in', { userName, selections });
+        handleVisibility(); // Check visibility on lock-in
     });
 
     confirmButton.addEventListener('click', () => {
@@ -85,15 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     viewAggregatedPicksButton.addEventListener('click', () => {
-        // Prompt user for password
         const password = prompt('Enter the password to view All Picks and Crashes:');
-
-        // Check if the entered password matches the expected password
-        if (password === 'CheatingStinky') { // Replace 'yourPasswordHere' with your actual password
-            // Open the aggregated picks page in a new tab
+        if (password === 'CheatingStinky') {
             window.open('/aggregated.html', '_blank');
         } else {
-            // Alert user if the password is incorrect
             alert('Incorrect password. Access denied.');
         }
     });
@@ -105,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${user.lockedIn ? 'Locked In' : 'Not Locked In'}</span></p>`;
         }).join('');
         confirmButton.disabled = !users.every(user => user.lockedIn);
-        resetButton.disabled = false; // Enable reset if any user is locked in
+        resetButton.disabled = false; 
     });
 
     socket.on('update-images', ({ commonSelections, userSelections }) => {
@@ -122,6 +123,8 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (userSelectionsSet.has(imgSrc)) {
                 img.classList.add('unique-selection');
             }
+
+            handleVisibility(); // Ensure visibility is handled on update
         });
     });
 
@@ -131,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const imgSrc = img.src.split('/').pop();
             if (lockedOutImages.includes(imgSrc)) {
                 img.classList.add('locked-out');
-                img.classList.remove('selected'); // Ensure it's deselected as well
+                img.classList.remove('selected');
             }
         });
     });
@@ -142,11 +145,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     socket.on('reset-all', () => {
         console.log('Reset all clients');
-        resetUI(); // Call the reset function to reset UI
-        // Optionally, re-enable the lock-in button if needed
+        resetUI(); 
         lockButton.disabled = false;
         confirmButton.disabled = true;
-        resetButton.disabled = true; // Ensure the reset button is also disabled until lock-in
+        resetButton.disabled = true; 
     });
 
     function getSelectedImages() {
@@ -154,16 +156,78 @@ document.addEventListener('DOMContentLoaded', () => {
             .map(img => img.src.split('/').pop());
     }
 
+    function handleVisibility() {
+        const hookshotTexSelected = document.querySelector('.selectable-image.selected[src$="gItemIconHookshotTex.png"]');
+        const scaleATexSelected = document.querySelector('.selectable-image.selected[src$="gItemIconScaleATex.png"]');
+        const strengthTexASelected = document.querySelector('.selectable-image.selected[src$="gItemIconStrengthTexA.png"]');
+        const strengthTexBSelected = document.querySelector('.selectable-image.selected[src$="gItemIconStrengthTexB.png"]');
+        const strengthTexCSelected = document.querySelector('.selectable-image.selected[src$="gItemIconStrengthTexC.png"]');
+
+        let showWarning = false;
+
+        document.querySelectorAll('.selectable-image').forEach(img => {
+            const imgSrc = img.src.split('/').pop();
+
+            // Handle visibility for Hookshot
+            if (imgSrc === 'gItemIconHookshotTexB.png') {
+                if (hookshotTexSelected) {
+                    img.style.display = 'block';
+                } else {
+                    img.style.display = 'none';
+                    img.classList.remove('selected');
+                }
+            }
+
+            // Handle visibility for Scale
+            if (imgSrc === 'gItemIconScaleBTex.png') {
+                if (scaleATexSelected) {
+                    img.style.display = 'block';
+                } else {
+                    img.style.display = 'none';
+                    img.classList.remove('selected');
+                }
+            }
+
+            // Handle visibility for Strength B
+            if (imgSrc === 'gItemIconStrengthTexB.png') {
+                if (strengthTexASelected) {
+                    img.style.display = 'block';
+                } else {
+                    img.style.display = 'none';
+                    img.classList.remove('selected');
+                }
+            }
+
+            // Handle visibility for Strength C
+            if (imgSrc === 'gItemIconStrengthTexC.png') {
+                if (strengthTexASelected && strengthTexBSelected) {
+                    img.style.display = 'block';
+                } else {
+                    img.style.display = 'none';
+                    img.classList.remove('selected');
+                }
+            }
+
+            // Check for specific items to show warning
+            if (['gItemIconHookshotTex.png', 'gItemIconScaleATex.png', 'gItemIconStrengthTexA.png'].includes(imgSrc) && img.classList.contains('selected')) {
+                showWarning = true;
+            }
+        });
+
+        // Show or hide the warning message based on selection
+        warningMessage.style.display = showWarning ? 'block' : 'none';
+    }
+
     function resetUI() {
         document.querySelectorAll('.selectable-image').forEach(img => {
             img.classList.remove('selected', 'common-selection', 'unique-selection', 'locked-out');
+            img.style.display = 'block'; // Reset display to default
         });
         lockButton.disabled = false;
         confirmButton.disabled = true;
-        resetButton.disabled = true; // Disable reset until user is locked in
+        resetButton.disabled = true;
         isLockedIn = false;
-
-        // Clear and reset user status
-        socket.emit('update-users'); // Request the current user statuses from the server
+        socket.emit('update-users');
+        handleVisibility(); // Reapply visibility rules
     }
 });

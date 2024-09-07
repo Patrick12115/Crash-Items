@@ -3,10 +3,15 @@ const http = require('http');
 const path = require('path');
 const fs = require('fs');
 const socketIo = require('socket.io');
-const lockoutSelections = {};
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
+
+const lockoutSelections = {};
+let users = [];
+let imageSelections = {};
+let lockedOutImages = [];
+let aggregatedSelections = {}; // Store aggregated picks here
 
 app.use(express.static(path.join(__dirname, '../public')));
 
@@ -36,15 +41,11 @@ app.get('/aggregated-picks', (req, res) => {
 app.get('/aggregated-picks-data', (req, res) => {
     res.json({
         aggregatedSelections,
-		lockedOutImages,
-        images: fs.readdirSync(path.join(__dirname, '../public/images'))
+        lockedOutImages,
+        images: fs.readdirSync(path.join(__dirname, '../public/images')),
+        showHookshotTexB: aggregatedSelections['gItemIconHookshotTex.png'] > 0 // Add this line
     });
 });
-
-let users = [];
-let imageSelections = {};
-let lockedOutImages = [];
-let aggregatedSelections = {}; // Store aggregated picks here
 
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
@@ -85,6 +86,38 @@ io.on('connection', (socket) => {
         });
 
         console.log('Aggregated selections:', selections);
+
+        // Check and adjust the count for hookshot textures
+        const hookshotTexCount = selections['gItemIconHookshotTex.png'] || 0;
+        if (hookshotTexCount >= 2) {
+            if (!selections['gItemIconHookshotTexB.png']) {
+                selections['gItemIconHookshotTexB.png'] = 0;
+            }
+            selections['gItemIconHookshotTexB.png'] += hookshotTexCount;
+        }
+
+        // Check and adjust the count for strength textures
+        const strengthTexACount = selections['gItemIconStrengthTexA.png'] || 0;
+        if (strengthTexACount >= 2) {
+            if (!selections['gItemIconStrengthTexB.png']) {
+                selections['gItemIconStrengthTexB.png'] = 0;
+            }
+            selections['gItemIconStrengthTexB.png'] += strengthTexACount;
+
+            if (!selections['gItemIconStrengthTexC.png']) {
+                selections['gItemIconStrengthTexC.png'] = 0;
+            }
+            selections['gItemIconStrengthTexC.png'] += strengthTexACount;
+        }
+
+        // Check and adjust the count for scale textures
+        const scaleTexACount = selections['gItemIconScaleATex.png'] || 0;
+        if (scaleTexACount >= 2) {
+            if (!selections['gItemIconScaleBTex.png']) {
+                selections['gItemIconScaleBTex.png'] = 0;
+            }
+            selections['gItemIconScaleBTex.png'] += scaleTexACount;
+        }
 
         aggregatedSelections = selections; // Update aggregated selections
 
