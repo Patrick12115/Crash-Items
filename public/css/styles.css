@@ -1,72 +1,161 @@
 /* General styles */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Arial', sans-serif;
+    background-color: #2c3e50; /* Darker background for the whole page */
+    color: #ecf0f1; /* Light text color */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 50vh;
+    align-items: center;
+    justify-content: center; /* Center content vertically */
+}
+
+/* Main container styles */
+main {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center items horizontally */
+    padding: 20px;
     text-align: center;
-    background-color: #333; /* Dark background for the whole page */
-    color: white;
 }
 
-#user-status, #image-container {
+/* Title styles */
+h1 {
+    margin: 0;
+    padding-bottom: 20px; /* Add padding to the top */
+    font-size: 2.5rem; /* Increase font size for better prominence */
+    font-weight: bold;
+    color: #f39c12; /* Gold color for the title */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Subtle shadow for depth */
+}
+
+/* User Status Styles */
+#user-status {
+    background: linear-gradient(135deg, #34495e, #2c3e50); /* Gradient background for a richer look */
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     margin-bottom: 20px;
+    text-align: center; /* Center the text inside the div */
+    width: fit-content; /* Adjust width to content */
+    display: inline-block; /* Make the div fit content width */
 }
 
+/* User status list item styling */
+#user-status p {
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+    color: #fff; /* White text color */
+    background: linear-gradient(135deg, #2c3e50, #34495e); /* Gradient for individual status items */
+}
+
+#user-status p.locked-in {
+    background: linear-gradient(135deg, #2ecc71, #27ae60); /* Green gradient for Locked In */
+}
+
+#user-status p.not-locked-in {
+    background: linear-gradient(135deg, #e74c3c, #c0392b); /* Red gradient for Not Locked In */
+}
+
+/* Image container styles */
+#image-container-wrapper {
+    width: 90%;
+    display: flex;
+    justify-content: center;
+    padding: 20px; /* Padding around the images container */
+    background: linear-gradient(135deg, #34495e, #2c3e50); /* Gradient background for the container */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Shadow for depth */
+    box-sizing: border-box; /* Ensure padding is included in the width calculation */
+    margin: 0 auto; /* Center the container horizontally */
+}
+
+/* Image container styles */
 #image-container {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: center; /* Center images horizontally */
+    gap: 15px; /* Space between images */
+    max-width: 100%; /* Ensure container doesn't exceed viewport width */
 }
 
+/* Image styling */
 img.selectable-image, img.image {
-    width: 100px; /* Ensure images are consistent in size */
-    height: 100px;
-    margin: 10px;
+    width: 120px; /* Set a fixed width for images */
+    height: auto;
     cursor: pointer;
     border: 2px solid transparent;
     transition: border 0.3s ease, background-color 0.3s ease;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(155, 155, 155, 0.1)); /* Subtle gradient for images */
 }
 
 img.selectable-image.selected, img.image.selected {
-    border-color: blue;
-}
-
-button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #4CAF50; /* Green */
-    color: white;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-button.locked-in {
-    background-color: #d9534f; /* Red */
-}
-
-button:disabled {
-    background-color: #aaa; /* Gray */
+    border-color: #3498db; /* Bright blue */
 }
 
 /* Styles for selection indicators */
 img.common-selection {
-    border-color: red;
-    background-color: rgba(255, 0, 0, 0.3); /* Red with transparency */
+    border-color: #e74c3c; /* Red */
+    background-color: rgba(231, 76, 60, 0.8); /* Red with transparency */
 }
 
 img.unique-selection {
-    border-color: green;
-    background-color: rgba(0, 255, 0, 0.3); /* Green with transparency */
+    border-color: #2ecc71; /* Green */
+    background-color: rgba(46, 204, 113, 0.8); /* Green with transparency */
 }
+
 img.locked-out {
-    border-color: grey;
-    background-color: rgba(128, 128, 128, 0.5); /* Grey with transparency */
+    border-color: #95a5a6; /* Gray */
+	filter: brightness(50%);
+    background-color: rgba(44, 62, 80, 0.7); /* Darker gray with transparency */
     pointer-events: none; /* Make it unclickable */
 }
-#lockout-button {
-    background-color: red;
-    color: white;
+
+button.action-button {
+    margin: 10px;
+    padding: 12px 24px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: none;
+    color: #fff;
+    background: linear-gradient(135deg, #2ecc71, #27ae60); /* Gradient green */
+    cursor: pointer;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
 }
-#lockout-button:hover:not(:disabled) {
-    background-color: darkred;
+
+button.action-button:disabled {
+    background: linear-gradient(135deg, #95a5a6, #7f8c8d); /* Gray gradient */
+    cursor: not-allowed;
+}
+
+button.action-button:hover:not(:disabled) {
+    background: linear-gradient(135deg, #27ae60, #2ecc71); /* Darker green gradient */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+button.action-button.locked-in {
+    background: linear-gradient(135deg, #e74c3c, #c0392b); /* Red gradient */
+}
+
+button.action-button#lockout-button {
+    background: linear-gradient(135deg, #e74c3c, #c0392b); /* Red gradient */
+}
+
+button.action-button#lockout-button:hover:not(:disabled) {
+    background: linear-gradient(135deg, #c0392b, #e74c3c); /* Darker red gradient */
+}
+
+.warning-message {
+    color: #e74c3c; /* Red */
+    font-weight: bold;
+    margin: 20px 0; /* Add vertical spacing above and below the warning message */
+    padding: 10px; /* Optional: add padding for better spacing within the warning message box */
+    font-size: 1.2rem;
+    background: linear-gradient(135deg, rgba(231, 76, 60, 0.1), rgba(231, 76, 60, 0.2)); /* Gradient background for warning message */
+    border-radius: 5px; /* Optional: round the corners of the background */
 }

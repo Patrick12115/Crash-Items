@@ -1,4 +1,4 @@
-<!DOCTYPE h<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,15 +7,21 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <h1>Crash Items</h1>
-    <div id="user-status"></div>
-	<div id="warning-message" style="color: red; display: none;">WARNING: Progressive Items count as the same item and will crash if the base Item is selected. Proceed with caution</div>
-    <div id="image-container"></div>
-    <button id="lock-button">Lock In</button>
-    <button id="confirm-button" disabled>Confirm</button>
-    <button id="reset-button" disabled>Reset</button>
-    <button id="lockout-button">Lockout</button>
-    <button id="view-aggregated-picks-button">View All Picks</button> <!-- New Button -->
+    <main>
+        <h1>Crash Items</h1>
+        <div id="user-status" class="status-container"></div>
+        <div id="warning-message" class="warning-message">WARNING: Progressive Items count as the same item and will crash if the base Item is selected. Proceed with caution.</div>
+        <div id="image-container-wrapper">
+			<div id="image-container"></div>
+		</div>
+        <div class="button-container">
+            <button id="lock-button" class="action-button">Lock In</button>
+            <button id="confirm-button" class="action-button" disabled>Confirm</button>
+            <button id="reset-button" class="action-button" disabled>Reset</button>
+            <button id="lockout-button" class="action-button">Lockout</button>
+            <button id="view-aggregated-picks-button" class="action-button">View All Picks</button>
+        </div>
+    </main>
     <script src="/socket.io/socket.io.js"></script>
     <script src="js/main.js"></script>
 </body>

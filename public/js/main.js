@@ -100,14 +100,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     socket.on('update-users', (users) => {
-        console.log('Updated users:', users);
-        userStatusDiv.innerHTML = users.map(user => {
-            return `<p>${user.userName || 'Unknown'}: <span class="${user.lockedIn ? 'locked-in' : 'not-locked-in'}">
-                ${user.lockedIn ? 'Locked In' : 'Not Locked In'}</span></p>`;
-        }).join('');
-        confirmButton.disabled = !users.every(user => user.lockedIn);
-        resetButton.disabled = false; 
-    });
+		console.log('Updated users:', users);
+		userStatusDiv.innerHTML = users.map(user => {
+			return `<p class="${user.lockedIn ? 'locked-in' : 'not-locked-in'}">
+				${user.userName || 'Unknown'}: ${user.lockedIn ? 'Locked In' : 'Not Locked In'}</p>`;
+		}).join('');
+		confirmButton.disabled = !users.every(user => user.lockedIn);
+		resetButton.disabled = false; 
+	});
+
 
     socket.on('update-images', ({ commonSelections, userSelections }) => {
         console.log('Common selections:', commonSelections);
