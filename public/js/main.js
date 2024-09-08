@@ -156,67 +156,79 @@ document.addEventListener('DOMContentLoaded', () => {
             .map(img => img.src.split('/').pop());
     }
 
-    function handleVisibility() {
-        const hookshotTexSelected = document.querySelector('.selectable-image.selected[src$="gItemIconHookshotTex.png"]');
-        const scaleATexSelected = document.querySelector('.selectable-image.selected[src$="gItemIconScaleATex.png"]');
-        const strengthTexASelected = document.querySelector('.selectable-image.selected[src$="gItemIconStrengthTexA.png"]');
-        const strengthTexBSelected = document.querySelector('.selectable-image.selected[src$="gItemIconStrengthTexB.png"]');
-        const strengthTexCSelected = document.querySelector('.selectable-image.selected[src$="gItemIconStrengthTexC.png"]');
+	function handleVisibility() {
+		const hookshotTexSelected = document.querySelector('.selectable-image.selected[src$="gItemIconHookshotTex.png"]');
+		const scaleATexSelected = document.querySelector('.selectable-image.selected[src$="gItemIconScaleATex.png"]');
+		const strengthTexASelected = document.querySelector('.selectable-image.selected[src$="gItemIconStrengthTexA.png"]');
+		const strengthTexBSelected = document.querySelector('.selectable-image.selected[src$="gItemIconStrengthTexB.png"]');
+		const strengthTexCSelected = document.querySelector('.selectable-image.selected[src$="gItemIconStrengthTexC.png"]');
+		const walletATexSelected = document.querySelector('.selectable-image.selected[src$="gItemIconWalletATex.png"]');
 
-        let showWarning = false;
+		let showWarning = false;
 
-        document.querySelectorAll('.selectable-image').forEach(img => {
-            const imgSrc = img.src.split('/').pop();
+		document.querySelectorAll('.selectable-image').forEach(img => {
+			const imgSrc = img.src.split('/').pop();
 
-            // Handle visibility for Hookshot
-            if (imgSrc === 'gItemIconHookshotTexB.png') {
-                if (hookshotTexSelected) {
-                    img.style.display = 'block';
-                } else {
-                    img.style.display = 'none';
-                    img.classList.remove('selected');
-                }
-            }
+			// Handle visibility for Hookshot
+			if (imgSrc === 'gItemIconHookshotTexB.png') {
+				if (hookshotTexSelected) {
+					img.style.display = 'block';
+				} else {
+					img.style.display = 'none';
+					img.classList.remove('selected');
+				}
+			}
 
-            // Handle visibility for Scale
-            if (imgSrc === 'gItemIconScaleBTex.png') {
-                if (scaleATexSelected) {
-                    img.style.display = 'block';
-                } else {
-                    img.style.display = 'none';
-                    img.classList.remove('selected');
-                }
-            }
+			// Handle visibility for Scale
+			if (imgSrc === 'gItemIconScaleBTex.png') {
+				if (scaleATexSelected) {
+					img.style.display = 'block';
+				} else {
+					img.style.display = 'none';
+					img.classList.remove('selected');
+				}
+			}
 
-            // Handle visibility for Strength B
-            if (imgSrc === 'gItemIconStrengthTexB.png') {
-                if (strengthTexASelected) {
-                    img.style.display = 'block';
-                } else {
-                    img.style.display = 'none';
-                    img.classList.remove('selected');
-                }
-            }
+			// Handle visibility for Strength B
+			if (imgSrc === 'gItemIconStrengthTexB.png') {
+				if (strengthTexASelected) {
+					img.style.display = 'block';
+				} else {
+					img.style.display = 'none';
+					img.classList.remove('selected');
+				}
+			}
 
-            // Handle visibility for Strength C
-            if (imgSrc === 'gItemIconStrengthTexC.png') {
-                if (strengthTexASelected && strengthTexBSelected) {
-                    img.style.display = 'block';
-                } else {
-                    img.style.display = 'none';
-                    img.classList.remove('selected');
-                }
-            }
+			// Handle visibility for Strength C
+			if (imgSrc === 'gItemIconStrengthTexC.png') {
+				if (strengthTexASelected && strengthTexBSelected) {
+					img.style.display = 'block';
+				} else {
+					img.style.display = 'none';
+					img.classList.remove('selected');
+				}
+			}
 
-            // Check for specific items to show warning
-            if (['gItemIconHookshotTex.png', 'gItemIconScaleATex.png', 'gItemIconStrengthTexA.png'].includes(imgSrc) && img.classList.contains('selected')) {
-                showWarning = true;
-            }
-        });
+			// Handle visibility for Wallet B (new logic)
+			if (imgSrc === 'gItemIconWalletBTex.png') {
+				if (walletATexSelected) {
+					img.style.display = 'block';
+				} else {
+					img.style.display = 'none';
+					img.classList.remove('selected');
+				}
+			}
 
-        // Show or hide the warning message based on selection
-        warningMessage.style.display = showWarning ? 'block' : 'none';
-    }
+			// Check for specific items to show warning
+			if (['gItemIconHookshotTex.png', 'gItemIconScaleATex.png', 'gItemIconStrengthTexA.png', 'gItemIconWalletATex.png'].includes(imgSrc) && img.classList.contains('selected')) { 
+				showWarning = true;
+			}
+		});
+
+		// Show or hide the warning message based on selection
+		warningMessage.style.display = showWarning ? 'block' : 'none';
+	}
+
 
     function resetUI() {
         document.querySelectorAll('.selectable-image').forEach(img => {

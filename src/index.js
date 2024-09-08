@@ -118,6 +118,15 @@ io.on('connection', (socket) => {
             }
             selections['gItemIconScaleBTex.png'] += scaleTexACount;
         }
+		
+		// Check and adjust the count for wallet textures
+		const walletTexACount = selections['gItemIconWalletATex.png'] || 0;
+		if (walletTexACount >= 2) {
+			if (!selections['gItemIconWalletBTex.png']) {
+				selections['gItemIconWalletBTex.png'] = 0;
+			}
+			selections['gItemIconWalletBTex.png'] += walletTexACount;
+		}
 
         aggregatedSelections = selections; // Update aggregated selections
 
